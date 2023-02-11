@@ -29,8 +29,7 @@ This is an e-commerce website for a clothing store made using Next.js framework.
 
 
 <details>
-  <summary>The title of the image group</summary><details>
-  <img src="image-url" name="image-name">
-  <img src="image-url" name="image-name">
-  <img src="image-url" name="image-name">
+  <summary>Home</summary><details>
+  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/home1.png" name="image-name">
+  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/home2.png" name="image-name">
 </details>
