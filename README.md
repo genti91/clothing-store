@@ -13,23 +13,25 @@ This is an e-commerce website for a clothing store made using Next.js framework.
 
 ![App Screenshot](https://raw.githubusercontent.com/genti91/clothing-store/main/images/store1.png)
 
-![App Screenshot](https://raw.githubusercontent.com/genti91/clothing-store/main/images/home1.png)
-
-![App Screenshot](https://raw.githubusercontent.com/genti91/clothing-store/main/images/home2.png)
-
-![App Screenshot](https://raw.githubusercontent.com/genti91/clothing-store/main/images/store1.png)
-
-![App Screenshot](https://raw.githubusercontent.com/genti91/clothing-store/main/images/store2.png)
-
-![App Screenshot](https://raw.githubusercontent.com/genti91/clothing-store/main/images/details1.png)
-
-![App Screenshot](https://raw.githubusercontent.com/genti91/clothing-store/main/images/details2.png)
-
-![App Screenshot](https://raw.githubusercontent.com/genti91/clothing-store/main/images/contact.png)
-
-
 <details>
   <summary>Home</summary>
-  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/home1.png" name="image-name">
-  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/home2.png" name="image-name">
+  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/home1.png" name="home1">
+  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/home2.png" name="home2">
+</details>
+
+<details>
+  <summary>Store</summary>
+  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/store1.png" name="store1">
+  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/store2.png" name="store2">
+</details>
+
+<details>
+  <summary>Details</summary>
+  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/details1.png" name="details1">
+  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/details2.png" name="details2">
+</details>
+
+<details>
+  <summary>Contact</summary>
+  <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/contact.png" name="contact">
 </details>
