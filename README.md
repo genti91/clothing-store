@@ -29,7 +29,7 @@ This is an e-commerce website for a clothing store made using Next.js framework.
 
 
 <details>
-  <summary>Home</summary><details>
+  <summary>Home</summary>
   <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/home1.png" name="image-name">
   <img src="https://raw.githubusercontent.com/genti91/clothing-store/main/images/home2.png" name="image-name">
 </details>
