@@ -17,8 +17,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function createBrand(req: NextApiRequest, res: NextApiResponse) {
   const { name } = req.body
+  console.log(name)
   try{
-    const brand = await prisma.brands.create({
+    const brand = await prisma.brand.create({
       data: {
         name: name,
       }
@@ -32,7 +33,7 @@ async function createBrand(req: NextApiRequest, res: NextApiResponse) {
 
 async function getBrands(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const brands = await prisma.brands.findMany({
+    const brands = await prisma.brand.findMany({
         include: {
             _count: {
                 select: {
@@ -50,7 +51,7 @@ async function getBrands(req: NextApiRequest, res: NextApiResponse) {
 async function deletetBrand(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query
   try {
-    const brand = await prisma.brands.delete({
+    const brand = await prisma.brand.delete({
       where: {
         id: Number(id)
       }
@@ -64,7 +65,7 @@ async function deletetBrand(req: NextApiRequest, res: NextApiResponse) {
 async function editBrand(req: NextApiRequest, res: NextApiResponse) {
   const { id, name } = req.body
   try {
-    const brand = await prisma.brands.update({
+    const brand = await prisma.brand.update({
       where: {
         id: Number(id)
       },

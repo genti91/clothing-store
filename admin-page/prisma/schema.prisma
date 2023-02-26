@@ -9,27 +9,40 @@ datasource db {
 }
 
 model Product {
-  id Int @id @default(autoincrement())
-  name String
-  price Float
-  img String
-  description String
-  brandId Int
-  brand Brands @relation(fields: [brandId], references: [id])
-  @@index([brandId])
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  brand       Brand     @relation(fields: [brandId], references: [id])
+  brandId     Int
+  @@index([brandId], name: "brandId")
+  pictures    Picture[]
+  sizes       Size[]    @relation("ProductSize")
+  colors      Color[]   @relation("ProductColor")
 }
 
-model Brands {
-  id Int @id @default(autoincrement())
-  name String
+model Picture {
+  id        Int    @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  @@index([productId], name: "productId")
+}
+
+model Brand {
+  id       Int       @id @default(autoincrement())
+  name     String
   products Product[]
 }
-model Colors {
-  id Int @id @default(autoincrement())
-  name String
-  color String
+
+model Size {
+  id      Int       @id @default(autoincrement())
+  name    String
+  products Product[] @relation("ProductSize")
 }
-model Sizes {
-  id Int @id @default(autoincrement())
-  size String
+
+model Color {
+  id      Int       @id @default(autoincrement())
+  name    String
+  products Product[] @relation("ProductColor")
 }

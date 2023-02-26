@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).json({ message: 'Method not allowed' })
   }
 }
-
+// images products One-To-Many
 async function createProduct(req: NextApiRequest, res: NextApiResponse) {
   const { name, price, img, description } = req.body
   try{
