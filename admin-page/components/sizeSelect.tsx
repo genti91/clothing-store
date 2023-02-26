@@ -19,14 +19,6 @@ const MenuProps = {
   },
 };
 
-const names = [
-  'XS',
-  'S',
-  'M',
-  'L',
-  'XL',
-];
-
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
   return {
     fontWeight:
@@ -36,9 +28,10 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
   };
 }
 
-export default function SizeSelect() {
+export default function SizeSelect({sizes}) {
   const theme = useTheme();
   const [personName, setPersonName] = React.useState<string[]>([]);
+  const names = sizes.map((size) => size.name);
 
   const handleChange = (event: SelectChangeEvent<typeof personName>) => {
     const {

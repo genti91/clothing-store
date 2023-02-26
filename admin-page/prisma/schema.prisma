@@ -44,5 +44,6 @@ model Size {
 model Color {
   id      Int       @id @default(autoincrement())
   name    String
+  hex     String
   products Product[] @relation("ProductColor")
 }

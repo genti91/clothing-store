@@ -16,12 +16,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function createColor(req: NextApiRequest, res: NextApiResponse) {
-  const { name } = req.body
+  const { name, hex } = req.body
   console.log(name)
   try{
     const color = await prisma.color.create({
       data: {
         name: name,
+        hex: hex
       }
     })
     res.status(200).json(color)

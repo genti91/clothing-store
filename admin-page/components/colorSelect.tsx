@@ -19,14 +19,6 @@ const MenuProps = {
   },
 };
 
-const names = [
-  'Red',
-  'White',
-  'Green',
-  'Black',
-  'Yellow',
-];
-
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
   return {
     fontWeight:
@@ -36,9 +28,10 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
   };
 }
 
-export default function ColorSelect() {
+export default function ColorSelect({colors}) {
   const theme = useTheme();
   const [personName, setPersonName] = React.useState<string[]>([]);
+  const names = colors.map((color) => color.name);
 
   const handleChange = (event: SelectChangeEvent<typeof personName>) => {
     const {

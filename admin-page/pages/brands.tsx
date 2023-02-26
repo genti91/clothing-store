@@ -25,9 +25,10 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
 
-export default function EditBrands ({brands}:any){
+export default function EditBrands ({brands, colors, sizes}:any){
 
     const [brand, setBrand] = useState('');
+    const [size, setSize] = useState('');
     const [open, setOpen] = useState(false);
 
     const router = useRouter();
@@ -35,19 +36,23 @@ export default function EditBrands ({brands}:any){
         router.replace(router.asPath);
     }
 
-    const handleClick = async () => {
+    const handleClick = async (e:string) => {
+        console.log(e)
+        if(e === 'brands' && brand === '') return;
+        if(e === 'sizes' && size === '') return;
         try{
-            let newBrand = await fetch('http://localhost:3000/api/brands', {
+            await fetch(`http://localhost:3000/api/${e}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    name: brand
+                    name: e === 'brands' ? brand : size
                 })
             })
             refreshData();
             setBrand('');
+            setSize('');
             setOpen(true);
         } catch (error) {
             console.log(error)
@@ -86,7 +91,7 @@ export default function EditBrands ({brands}:any){
                 <InputAdornment position="end">
                     <IconButton
                     edge="end"
-                    onClick={handleClick}
+                    onClick={() => handleClick('brands')}
                     >
                         <AddCircleIcon />
                     </IconButton>
@@ -133,20 +138,23 @@ export default function EditBrands ({brands}:any){
             <Box sx={{ p: 2, border: '1px solid rgba(121, 121, 121, 0.426)', borderRadius:'5px', width: "270px"}}>
             
             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-            <InputLabel htmlFor="add-brand">Add Brand</InputLabel>
+            <InputLabel htmlFor="add-size">Add Size</InputLabel>
             <OutlinedInput
-                id="add-brand"
+                id="add-size"
                 type='text'
+                value={size}
+                onChange={(e) => setSize(e.target.value)}
                 endAdornment={
                 <InputAdornment position="end">
                     <IconButton
                     edge="end"
+                    onClick={() => handleClick('sizes')}
                     >
                         <AddCircleIcon />
                     </IconButton>
                 </InputAdornment>
                 }
-                label="Add Brand"
+                label="Add Size"
             />
             </FormControl>
 
@@ -161,7 +169,7 @@ export default function EditBrands ({brands}:any){
                   }}
             >
 
-                {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20].map((value, i) => {
+                {!sizes.error && sizes.map((size:any, i:number) => {
                 return(
                 <ListItem key={i}
                     secondaryAction={
@@ -175,7 +183,7 @@ export default function EditBrands ({brands}:any){
                         </div>
                     }
                 >
-                    Item ({i})
+                    {size.name} ({size._count.products})
                 </ListItem>
                 )})}
             </List>
@@ -187,7 +195,7 @@ export default function EditBrands ({brands}:any){
             <Box sx={{ p: 2, border: '1px solid rgba(121, 121, 121, 0.426)', borderRadius:'5px', width: "270px"}}>
             
             <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-            <CustomizedDialogs/>
+            <CustomizedDialogs refreshData={refreshData}/>
             </FormControl>
 
             <List
@@ -201,7 +209,7 @@ export default function EditBrands ({brands}:any){
                   }}
             >
 
-                {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20].map((value, i) => {
+                {!colors.error && colors?.map((color:any, i:number) => {
                 return(
                 <ListItem key={i}
                     secondaryAction={
@@ -215,7 +223,7 @@ export default function EditBrands ({brands}:any){
                         </div>
                     }
                 >
-                    Item ({i})
+                    {color.name} ({color._count.products})
                 </ListItem>
                 )})}
             </List>
@@ -237,9 +245,29 @@ export async function getServerSideProps() {
         }
     })
     const brands = await res.json();
+
+    const colorRes = await fetch(`http://localhost:3000/api/colors`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    const colors = await colorRes.json();
+
+
+    const siezesRes = await fetch(`http://localhost:3000/api/sizes`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    const sizes = await siezesRes.json();
+
     return {
         props: {
-            brands
+            brands,
+            colors,
+            sizes
         }
     }
 }

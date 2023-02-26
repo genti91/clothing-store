@@ -40,7 +40,7 @@ interface Error {
   image: string;
 }
 
-export default function Form() {
+export default function Form({brands, colors, sizes}) {
 
   const validate = (values: Product) => {
     if (!values.name) error.name = 'Required';
@@ -147,15 +147,15 @@ export default function Form() {
             <Autocomplete
               disablePortal
               id="combo-box-demo"
-              options={[{label:"Brand 1"}, {label:"Brand 2"}, {label:"Brand 3"}]}
+              options={!brands.error && brands.map((e:any) => ({label: e.name}))}
               renderInput={(params) => <TextField {...params} label="Brand" />}
             />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <ColorSelect/>
+              <ColorSelect colors={colors}/>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <SizeSelect/>
+              <SizeSelect sizes={sizes}/>
             </Grid>
             <Grid item xs={12} sm={7}>
             <FormControl fullWidth >
@@ -201,4 +201,5 @@ export default function Form() {
     </Container>
   );
 }
-//
+
+
