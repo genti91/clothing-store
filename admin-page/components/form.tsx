@@ -43,23 +43,23 @@ interface Error {
 export default function Form({brands, colors, sizes}) {
 
   const validate = (values: Product) => {
-    if (!values.name) error.name = 'Required';
-    if (!values.price) error.price = 'Required';
-    if (!values.description) error.description = 'Required';
-    if (!values.category) error.category = 'Required';
-    if (!values.color) error.color = 'Required';
-    if (!values.size) error.size = 'Required';
-    if (!values.image) error.image = 'Required';
-    setError(error);
+    let required:any = {};
+    if (!values.name) required.name = 'Name is required';
+    // if (!values.price) required.price = 'Price is required';
+    // if (!values.description) required.description = 'Required';
+    // if (!values.category) required.category = 'Required';
+    // if (!values.color) required.color = 'Required';
+    // if (!values.size) required.size = 'Required';
+    // if (!values.image) required.image = 'Required';
+    setError({...error, ...required});
+    console.log(Object.keys(required).length)
+    return Object.keys(required).length > 0 ? true : false;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: any) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    if (validate(product)) return;
+    alert('hola')
   };
 
   const [product, setProduct] = React.useState<Product>({
@@ -125,8 +125,8 @@ export default function Form({brands, colors, sizes}) {
                 autoFocus
                 value={product.name}
                 onChange={(e) => setProduct({...product, name: e.target.value})}
-                error={true}
-                helperText={'Name is required'}
+                error={error.name ? true : false}
+                helperText={error.name}
               />
             </Grid>
             <Grid item xs={12}>
@@ -141,6 +141,8 @@ export default function Form({brands, colors, sizes}) {
                 rows={4}
                 value={product.description}
                 onChange={(e) => setProduct({...product, description: e.target.value})}
+                error={error.description ? true : false}
+                helperText={error.description}
               />
             </Grid>
             <Grid item xs={12}>
@@ -189,6 +191,7 @@ export default function Form({brands, colors, sizes}) {
           </Grid>
           <Button
             type="submit"
+            onClick={(e) => handleSubmit(e)}
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}

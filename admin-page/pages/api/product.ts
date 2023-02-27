@@ -11,16 +11,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).json({ message: 'Method not allowed' })
   }
 }
-// images products One-To-Many
+
 async function createProduct(req: NextApiRequest, res: NextApiResponse) {
-  const { name, price, img, description } = req.body
+  const { name, price, img, description, brand, colors, sizes} = req.body
   try{
     const product = await prisma.product.create({
       data: {
-        name: name,
+        name,
+        description,
         price: Number(price),
-        img: img,
-        description: description,
+        pictures: {
+          create: img.map((i: string) => ({ url: i }))
+        },
+        brand: {
+          connect: { id: brand }
+        },
+        colors: {
+          connect: colors.map((c: string) => ({ id: c }))
+        },
+        sizes: {
+          connect: sizes.map((s: string) => ({ id: s }))
+        },
       }
     })
     res.status(200).json(product)
@@ -32,7 +43,14 @@ async function createProduct(req: NextApiRequest, res: NextApiResponse) {
 
 async function getProducts(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const products = await prisma.product.findMany()
+    const products = await prisma.product.findMany({
+      include: {
+        pictures: true,
+        sizes: true,
+        brand: true,
+        colors: true,
+      }
+    })
     res.status(200).json(products)
   } catch (err) {
     res.status(500).json({ message: 'Error getting products', error: err})
