@@ -19,6 +19,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import ColorSelect from './colorSelect';
 import SizeSelect from './sizeSelect';
+import axios from 'axios';
 
 interface Product {
   name: string;
@@ -42,24 +43,27 @@ interface Error {
 
 export default function Form({brands, colors, sizes}) {
 
-  const validate = (values: Product) => {
+  const validate = (values: Product, images:string[]) => {
     let required:any = {};
     if (!values.name) required.name = 'Name is required';
-    // if (!values.price) required.price = 'Price is required';
-    // if (!values.description) required.description = 'Required';
+    if (!values.price) required.price = 'Price is required';
+    if (!values.description) required.description = 'Description is required';
     // if (!values.category) required.category = 'Required';
     // if (!values.color) required.color = 'Required';
     // if (!values.size) required.size = 'Required';
-    // if (!values.image) required.image = 'Required';
+    if (images.length === 0) required.image = 'Image is required';
     setError({...error, ...required});
     console.log(Object.keys(required).length)
     return Object.keys(required).length > 0 ? true : false;
   };
 
-  const handleSubmit = (event: any) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
-    if (validate(product)) return;
+    let images = await uploadToCloudinary();
+    console.log("images:",images)
+    if (validate(product,images)) return;
     alert('hola')
+    console.log(images)
   };
 
   const [product, setProduct] = React.useState<Product>({
@@ -79,10 +83,37 @@ export default function Form({brands, colors, sizes}) {
   const [fileInput, setFileInput] = React.useState('');
   const [selectedFile, setSelectedFile] = React.useState('');
   const [previewSource, setPreviewSource]:any = React.useState([]);
+  const [cloudinaryData, setCloudinaryData]:any = React.useState([]);
   const handleImageChange = (e:any) => {
     const file = e.target.files[0];
+    saveCloudinaryData(file);
     previewFile(file);
   }
+
+  const saveCloudinaryData = (file:any) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'ckofc6ef');
+    setCloudinaryData([...cloudinaryData, formData])
+    
+  }
+
+  const uploadToCloudinary = async () => {
+    let images:string[] = []
+    await cloudinaryData.forEach(async(e:any) => {
+      await axios.post('https://api.cloudinary.com/v1_1/dhtczuw9v/image/upload', e)
+      .then(res => {
+        console.log(res.data.url);
+      })
+      .catch(err => {
+        console.error(err);
+      })
+    })
+    setProduct((e) => ({...e, image:images}))
+    console.log("upload:",images)
+    return images
+  }
+
   const previewFile = (file:any) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -168,6 +199,7 @@ export default function Form({brands, colors, sizes}) {
                 label="Price"
                 value={product.price}
                 onChange={(e) => setProduct({...product, price: Number(e.target.value)})}
+                error={error.price ? true : false}
               />
             </FormControl>
             </Grid>
