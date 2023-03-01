@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -38,7 +38,9 @@ interface Error {
   image: string;
 }
 
-export default function Form({brands, colors, sizes}:any) {
+export default function Form({brands, colors, sizes, edit}:any) {
+
+  console.log(edit)
 
   const clearProduct = () => {
     return {
@@ -61,6 +63,22 @@ export default function Form({brands, colors, sizes}:any) {
   const [previewSource, setPreviewSource]:any = useState([]);
   const [cloudinaryData, setCloudinaryData]:any = useState([]);
   const [loading, setLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+  if (edit) {
+    setProduct({
+      name: edit.name,
+      price: edit.price,
+      description: edit.description,
+      brand: edit.brand.name,
+      category: [],
+      color: edit.colors.map((e:any) => e.name),
+      size: edit.sizes.map((e:any) => e.name),
+      image: []
+    })
+    setPreviewSource(edit.pictures.map((e:any) => ({src: e.url})))
+  }
+  }, [])
 
   const validate = (values: Product) => {
     let required:any = {};
@@ -204,6 +222,7 @@ export default function Form({brands, colors, sizes}:any) {
                   setProduct({...product, brand: newValue.value});
                 }
               }}
+              defaultValue={edit ? {label: edit.brand.name, value: edit.brand.id}: null}
             />
             </Grid>
             <Grid item xs={12} sm={6}>

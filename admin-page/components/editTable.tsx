@@ -32,7 +32,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 interface Column {
-  id: 'name' | 'brand' | 'stock' | 'size' | 'density';
+  id: 'name' | 'brand' | 'stock' | 'price' | 'id';
   label: string;
   minWidth?: number;
   align?: 'right';
@@ -43,21 +43,21 @@ const columns: readonly Column[] = [
   { id: 'name', label: 'Name', minWidth: 170 },
   { id: 'brand', label: 'Brand', minWidth: 100 },
   {
-    id: 'stock',
+    id: 'price',
     label: 'Stock',
     minWidth: 170,
     align: 'right',
     format: (value: number) => value.toLocaleString('en-US'),
   },
   {
-    id: 'size',
-    label: 'Sizes',
+    id: 'price',
+    label: 'Price',
     minWidth: 170,
     align: 'right',
     format: (value: number) => value.toLocaleString('en-US'),
   },
   {
-    id: 'density',
+    id: 'id',
     label: '',
     minWidth: 170,
     align: 'right',
@@ -65,35 +65,9 @@ const columns: readonly Column[] = [
   },
 ];
 
-interface Data {
-  name: string;
-  brand: string;
-  stock: number;
-  size: number;
-  density: number;
-}
+export default function EditTable({products}:any) {
 
-function createData(
-  name: string,
-  brand: string,
-  stock: number,
-  size: number,
-  density: number,
-): Data {
-  return { name, brand, stock, size, density };
-}
-
-const rows = [
-  createData('Remera roja', 'Banana Republic', 8, 6, 1342),
-  createData('Pantalon negro', 'Zara', 5, 4, 4355),
-  createData('Remera negra', 'IT', 10, 2, 2345),
-  createData('Remera azul', 'IT', 2, 5, 3456),
-  createData('Pantalon blanco', 'Zara', 5, 6, 23465),
-  createData('Australia', 'Banana Republic', 3, 2, 2345),
- 
-];
-
-export default function EditTable() {
+  console.log(products)
 
   return (
     <Paper sx={{ width: '85%', overflow: 'hidden' }}>
@@ -113,14 +87,19 @@ export default function EditTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, i) => {
+            {products.map((product:any, i:number) => {
                 return (
                   <StyledTableRow hover role="checkbox" tabIndex={-1} key={i}>
-                    {columns.map((column, i) => {
-                      const value = row[column.id];
+                    {columns.map((column:any, i) => {
+                      let value
+                      if(column.id === 'brand'){
+                        value = product.brand.name;
+                      }else{
+                        value = product[column.id];
+                      }
                       return (
                         <StyledTableCell key={i} align={column.align}>
-                          {column.id === 'density' ? (<Link href={`/edit/${value}`}><EditIcon/></Link>): (<>
+                          {column.id === 'id' ? (<Link href={`/edit/${value}`}><EditIcon/></Link>): (<>
                           {column.format && typeof value === 'number'
                             ? column.format(value)
                             : value}</>)}
