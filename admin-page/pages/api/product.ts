@@ -7,6 +7,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return await createProduct(req, res)
   } else if (req.method === 'GET') {
     return await getProducts(req, res)
+  } else if (req.method === 'PUT') {
+    return await updateProduct(req, res)
   } else {
     res.status(405).json({ message: 'Method not allowed' })
   }
@@ -56,3 +58,42 @@ async function getProducts(req: NextApiRequest, res: NextApiResponse) {
     res.status(500).json({ message: 'Error getting products', error: err})
   }
 } 
+
+async function updateProduct(req: NextApiRequest, res: NextApiResponse) {
+  const { id, name, price, image, description, brand, color, size } = req.body
+  try {
+    const updatedProduct = await prisma.product.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        price,
+        pictures: {
+          deleteMany: { productId: id },
+          create: image.map((i: string) => ({ url: i }))
+        },
+        brand: {
+          connect: { id: brand }
+        },
+        colors: {
+          disconnect: { productId: id },
+          connect: color.map((c: string) => ({ id: c }))
+        },
+        sizes: {
+          disconnect: { productId: id },
+          connect: size.map((s: string) => ({ id: s }))
+        },
+      },
+      include: {
+        pictures: true,
+        sizes: true,
+        brand: true,
+        colors: true,
+      }
+    })
+    res.status(200).json(updatedProduct)
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'Error updating product', error: err})
+  }
+}

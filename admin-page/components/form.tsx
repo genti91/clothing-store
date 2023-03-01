@@ -102,9 +102,17 @@ export default function Form({brands, colors, sizes, edit}:any) {
     return Object.keys(required).length > 0 ? true : false;
   };
 
+  const handleEdit = () => {
+    
+  }
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     if (validate(product)) return;
+    if (edit) {
+      handleEdit();
+      return;
+    }
     try{
       setLoading(true)
       let images = await uploadToCloudinary();
