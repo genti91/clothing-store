@@ -13,24 +13,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function createProduct(req: NextApiRequest, res: NextApiResponse) {
-  const { name, price, img, description, brand, colors, sizes} = req.body
+  const { name, price, image, description, brand, color, size } = req.body
   try{
     const product = await prisma.product.create({
       data: {
         name,
         description,
-        price: Number(price),
+        price: price,
         pictures: {
-          create: img.map((i: string) => ({ url: i }))
+          create: image.map((i: string) => ({ url: i }))
         },
         brand: {
           connect: { id: brand }
         },
         colors: {
-          connect: colors.map((c: string) => ({ id: c }))
+          connect: color.map((c: string) => ({ id: c }))
         },
         sizes: {
-          connect: sizes.map((s: string) => ({ id: s }))
+          connect: size.map((s: string) => ({ id: s }))
         },
       }
     })
