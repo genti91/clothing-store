@@ -15,6 +15,9 @@ import ColorSelect from './colorSelect';
 import SizeSelect from './sizeSelect';
 import axios from 'axios';
 import FormHelperText from '@mui/material/FormHelperText';
+import ImageGrid from './imageGrid.jsx';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 interface Product {
   name: string;
@@ -40,8 +43,6 @@ interface Error {
 
 export default function Form({brands, colors, sizes, edit}:any) {
 
-  console.log(edit)
-
   const clearProduct = () => {
     return {
       name: '',
@@ -63,6 +64,14 @@ export default function Form({brands, colors, sizes, edit}:any) {
   const [previewSource, setPreviewSource]:any = useState([]);
   const [cloudinaryData, setCloudinaryData]:any = useState([]);
   const [loading, setLoading] = useState<boolean>(false)
+  const [disableEdit, setDisableEdit] = useState<boolean>(edit ? true : false)
+  const [imagePos, setImagePos] = useState<boolean>(true)
+
+  const removeImage = (i:number) => {
+    previewSource.splice(i, 1);
+    setPreviewSource([...previewSource])
+  }
+
 
   useEffect(() => {
   if (edit) {
@@ -70,7 +79,7 @@ export default function Form({brands, colors, sizes, edit}:any) {
       name: edit.name,
       price: edit.price,
       description: edit.description,
-      brand: edit.brand.name,
+      brand: edit.brandId,
       category: [],
       color: edit.colors.map((e:any) => e.name),
       size: edit.sizes.map((e:any) => e.name),
@@ -98,7 +107,6 @@ export default function Form({brands, colors, sizes, edit}:any) {
     if (cloudinaryData.length === 0) required.image = 'Image is required';
     else error.image = '';
     setError({...error, ...required});
-    console.log(Object.keys(required).length)
     return Object.keys(required).length > 0 ? true : false;
   };
 
@@ -165,6 +173,21 @@ export default function Form({brands, colors, sizes, edit}:any) {
     }
   }
 
+  
+  const compareArrays = (a:string[], b:string[]) => a.length === b.length && a.every((e, i) => e === b[i]);
+
+  useEffect(() => {
+    if (!edit) return;
+    if (product.name === edit.name && product.price === edit.price && 
+        product.description === edit.description && product.brand === edit.brandId && 
+        compareArrays(product.color, edit.colors.map((e:any) => e.name)) && 
+        compareArrays(product.size, edit.sizes.map((e:any) => e.name))) {
+        setDisableEdit(true);
+    } else {
+      setDisableEdit(false);
+    }
+  },[product])
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -177,7 +200,7 @@ export default function Form({brands, colors, sizes, edit}:any) {
         }}
       >
         <Typography component="h1" variant="h5">
-          CREATE A NEW PRODUCT
+          {edit ? 'EDIT PRODUCT' : 'CREATE A NEW PRODUCT'}
         </Typography>
 
         { loading && (<Typography component="h1" variant="h5">
@@ -265,20 +288,39 @@ export default function Form({brands, colors, sizes, edit}:any) {
               </Button>
             </Grid>
             <Grid item xs={12}>
-              {previewSource && previewSource.map((e:any) => (
-                <img src={e.src} alt="chosen" style={{ height: '100px', margin: '3px'}} />
+              {/*<DndProvider backend={HTML5Backend}>
+                <ImageGrid previewSource={previewSource}/> 
+              </DndProvider>*/}
+                {/*<img src={e.src} alt="chosen" style={{ height: '100px', margin: '3px'}} />*/}
+              {previewSource && previewSource.map((e:any,i:number) => (
+                <div style={{borderRadius: '0.5rem', height:'9rem', width:'30%', margin:'0.4rem', display:'inline-block', backgroundImage: `url(${e.src})`, backgroundSize: 'cover', backgroundPosition: 'center', cursor:'pointer', position:'relative'}} key={e.id}
+                    onClick={(()=>setImagePos(!imagePos))}
+                >
+                  { imagePos ? <div style={{borderRadius: '0.5rem', color:'white', fontSize:40, height:'100%', width:'100%', backgroundColor:'rgb(0,0,0,0.3)', display:'flex', justifyContent:'center', alignItems:'center', cursor:'pointer'}}
+                      onClick={(()=>setImagePos(!imagePos))}
+                  >
+                      {i+1}
+                  </div> : null}
+                  <div style={{width:'1.5rem', height:'1.5rem', color:'rgb(155,155,155,0.7)', textAlign:'center', backgroundColor:'rgb(0,0,0,0.5)', position:'absolute', top:10, right:10, borderRadius:'100%', cursor:'pointer'}}
+                      onClick={(()=>removeImage(i))}
+                  >
+                    X
+                  </div>
+                </div>
               ))}
+              </Grid>
             </Grid>
-          </Grid>
           <FormHelperText error>{error.image}</FormHelperText>
+          
           <Button
             type="submit"
             onClick={(e) => handleSubmit(e)}
             fullWidth
             variant="contained"
+            disabled={disableEdit}
             sx={{ mt: 3, mb: 2 }}
           >
-            post product
+            {edit ? 'edit product' : 'post product'}
           </Button>
         </Box>
 

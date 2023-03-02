@@ -69,19 +69,24 @@ async function updateProduct(req: NextApiRequest, res: NextApiResponse) {
         description,
         price,
         pictures: {
-          deleteMany: { productId: id },
-          create: image.map((i: string) => ({ url: i }))
+          upsert: image.map((i: string) => ({
+            where: { url: i },
+            create: { url: i }
+          })),
+          deleteMany: {
+            url: {
+              notIn: image
+            }
+          }
         },
         brand: {
           connect: { id: brand }
         },
         colors: {
-          disconnect: { productId: id },
-          connect: color.map((c: string) => ({ id: c }))
+          set: color.map((c: number) => ({ id: c }))
         },
         sizes: {
-          disconnect: { productId: id },
-          connect: size.map((s: string) => ({ id: s }))
+          set: size.map((s: number) => ({ id: s }))
         },
       },
       include: {
