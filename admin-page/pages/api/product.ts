@@ -23,7 +23,7 @@ async function createProduct(req: NextApiRequest, res: NextApiResponse) {
         description,
         price: price,
         pictures: {
-          create: image.map((i: string) => ({ url: i }))
+          create: image.map((i:any) => ({ url: i.src, position: i.position}))
         },
         brand: {
           connect: { id: brand }

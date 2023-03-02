@@ -39,6 +39,7 @@ interface Error {
   color: string;
   size: string;
   image: string;
+  imageOrder: string;
 }
 
 export default function Form({brands, colors, sizes, edit}:any) {
@@ -58,7 +59,7 @@ export default function Form({brands, colors, sizes, edit}:any) {
   const [product, setProduct] = useState<Product>(clearProduct())
   const [error, setError] = useState<Error>({
     name: '', price: '', description: '', brand: '',
-    category: '', color: '', size: '', image: ''})
+    category: '', color: '', size: '', image: '', imageOrder:''})
   const [fileInput, setFileInput] = useState('');
   const [selectedFile, setSelectedFile] = useState('');
   const [previewSource, setPreviewSource]:any = useState([]);
@@ -68,9 +69,13 @@ export default function Form({brands, colors, sizes, edit}:any) {
   const [imagePos, setImagePos] = useState<boolean>(true)
 
   const removeImage = (i:number) => {
-    previewSource.splice(i, 1);
-    setPreviewSource([...previewSource])
+    
   }
+
+
+  // useEffect(() => {
+  //   console.log(previewSource) 
+  // }, [previewSource])
 
 
   useEffect(() => {
@@ -85,7 +90,7 @@ export default function Form({brands, colors, sizes, edit}:any) {
       size: edit.sizes.map((e:any) => e.name),
       image: []
     })
-    setPreviewSource(edit.pictures.map((e:any) => ({src: e.url})))
+    setPreviewSource(edit.pictures.map((e:any) => ({src: e.url, position: e.position})))
   }
   }, [])
 
@@ -105,7 +110,16 @@ export default function Form({brands, colors, sizes, edit}:any) {
     if (values.size.length === 0) required.size = 'Size is required';
     else error.size = '';
     if (cloudinaryData.length === 0) required.image = 'Image is required';
-    else error.image = '';
+    else {
+      error.image = '';
+      let checkPos = false;
+      cloudinaryData.forEach((e:any) => e.position === -1 ? checkPos = true : null)
+      if(checkPos) {
+        required.imageOrder = 'Please set image order'; 
+      } else {
+        error.imageOrder = '';
+      }
+    }
     setError({...error, ...required});
     return Object.keys(required).length > 0 ? true : false;
   };
@@ -148,18 +162,18 @@ export default function Form({brands, colors, sizes, edit}:any) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'ckofc6ef');
-    setCloudinaryData([...cloudinaryData, formData])
+    setCloudinaryData([...cloudinaryData, {data: formData, position: cloudinaryData.length}])
     
   }
 
   const uploadToCloudinary = async () => {
     try {
       const uploadPromises = cloudinaryData.map((e:any) =>
-        axios.post('https://api.cloudinary.com/v1_1/dhtczuw9v/image/upload', e)
+        axios.post('https://api.cloudinary.com/v1_1/dhtczuw9v/image/upload', e.data)
       );
       const uploadResponses = await Promise.all(uploadPromises);
       const imageUrls = uploadResponses.map(res => res.data.url);
-      return imageUrls;
+      return imageUrls.map((e:string,i:number) => ({src: e, position: previewSource[i].position}));
     } catch (err) {
       console.error(err);
     }
@@ -169,10 +183,60 @@ export default function Form({brands, colors, sizes, edit}:any) {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      setPreviewSource([...previewSource, {src: reader.result}]);
+      setPreviewSource([...previewSource, {src: reader.result, position: previewSource.length}]);
     }
   }
 
+  // const removePosition = (i:number) => {
+    // previewSource[i].position = -1;
+    // setPreviewSource([...previewSource])
+    // console.log(i)
+  // }
+
+  const setImagePosition = (index:number, remove:boolean) => {
+    if (remove) {
+      previewSource.splice(index, 1);
+      cloudinaryData.splice(index, 1);
+      setCloudinaryData(cloudinaryData)
+      setPreviewSource(previewSource.map((e:any) => ({src:e.src, position:-1})));
+    } else if (previewSource[index].position === -1) {
+      let usedPositions = previewSource.filter((e:any) => e.position !== -1).map((e:any) => e.position);
+      usedPositions.sort((a:number, b:number) => a - b);
+      console.log(usedPositions)
+      let positionsMissing = previewSource.length - usedPositions.length; 
+      let newPosition = -1;
+      let positionFound = false;
+      usedPositions.forEach((e:number, i:number) => {
+        console.log(e)
+        if (e !== i && !positionFound) {
+          newPosition = i;
+          positionFound = true
+          return;
+        } else if (usedPositions.length === 1 && !positionFound) {
+          newPosition = 1;
+          positionFound = true
+          return;
+        } 
+      });
+      if (positionsMissing !== 0 &&  !positionFound) {
+        newPosition = usedPositions.length;
+        positionFound = true
+      }
+      if (usedPositions.length === 0){
+        newPosition = 0
+      }
+      console.log(newPosition)
+      previewSource[index].position = newPosition;
+      setPreviewSource([...previewSource])
+    } else {
+      previewSource[index].position = -1;
+      setPreviewSource([...previewSource]) 
+    }
+  }
+
+  useEffect(() => {
+    setCloudinaryData(cloudinaryData.map((e:any,i:number) => ({...e, position: previewSource[i].position})))
+  }, [previewSource])
   
   const compareArrays = (a:string[], b:string[]) => a.length === b.length && a.every((e, i) => e === b[i]);
 
@@ -292,25 +356,28 @@ export default function Form({brands, colors, sizes, edit}:any) {
                 <ImageGrid previewSource={previewSource}/> 
               </DndProvider>*/}
                 {/*<img src={e.src} alt="chosen" style={{ height: '100px', margin: '3px'}} />*/}
+              <div style={{display:'flex', flexWrap:'wrap'}}>
               {previewSource && previewSource.map((e:any,i:number) => (
-                <div style={{borderRadius: '0.5rem', height:'9rem', width:'30%', margin:'0.4rem', display:'inline-block', backgroundImage: `url(${e.src})`, backgroundSize: 'cover', backgroundPosition: 'center', cursor:'pointer', position:'relative'}} key={e.id}
-                    onClick={(()=>setImagePos(!imagePos))}
+                <div style={{height:'9rem', width:'30%', margin:'0.4rem',position:'relative'}}>
+                <div style={{borderRadius: '0.5rem', height:'9rem', width:'100%', margin:'0.4rem', backgroundImage: `url(${e.src})`, backgroundSize: 'cover', backgroundPosition: 'center', cursor:'pointer', position:'relative'}} key={i}
+                    onClick={(()=>setImagePosition(i,false))}
                 >
-                  { imagePos ? <div style={{borderRadius: '0.5rem', color:'white', fontSize:40, height:'100%', width:'100%', backgroundColor:'rgb(0,0,0,0.3)', display:'flex', justifyContent:'center', alignItems:'center', cursor:'pointer'}}
-                      onClick={(()=>setImagePos(!imagePos))}
-                  >
-                      {i+1}
+                  {e.position !== -1 ? <div style={{borderRadius: '0.5rem', color:'white', fontSize:40, height:'100%', width:'100%', backgroundColor:'rgb(0,0,0,0.3)', display:'flex', justifyContent:'center', alignItems:'center', cursor:'pointer'}}>
+                      {e.position+1}
                   </div> : null}
-                  <div style={{width:'1.5rem', height:'1.5rem', color:'rgb(155,155,155,0.7)', textAlign:'center', backgroundColor:'rgb(0,0,0,0.5)', position:'absolute', top:10, right:10, borderRadius:'100%', cursor:'pointer'}}
-                      onClick={(()=>removeImage(i))}
+                </div>
+                  <div style={{width:'1.5rem', height:'1.5rem', color:'rgb(200,200,200,0.7)', textAlign:'center', borderWidth:'1px', borderColor:'', backgroundColor:'rgb(0,0,0,0.7)', position:'absolute', top:15, right:5, borderRadius:'100%', cursor:'pointer'}}
+                      onClick={(()=>setImagePosition(i,true))}
                   >
                     X
                   </div>
                 </div>
               ))}
-              </Grid>
+              </div>
             </Grid>
+          </Grid>
           <FormHelperText error>{error.image}</FormHelperText>
+          <FormHelperText error>{error.imageOrder}</FormHelperText>
           
           <Button
             type="submit"
