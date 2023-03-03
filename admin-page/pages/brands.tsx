@@ -25,9 +25,10 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
 
-export default function EditBrands ({brands, colors, sizes}:any){
+export default function EditBrands ({brands, colors, sizes, categories}:any){
 
     const [brand, setBrand] = useState('');
+    const [category, setCategory] = useState('');
     const [size, setSize] = useState('');
     const [open, setOpen] = useState(false);
 
@@ -40,19 +41,25 @@ export default function EditBrands ({brands, colors, sizes}:any){
         console.log(e)
         if(e === 'brands' && brand === '') return;
         if(e === 'sizes' && size === '') return;
+        if(e === 'categories' && category === '') return;
         try{
+            let send;
+            if(e === 'brands') send = brand;
+            if(e === 'sizes') send = size;
+            if(e === 'categories') send = category;
             await fetch(`http://localhost:3000/api/${e}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    name: e === 'brands' ? brand : size
+                    name: send
                 })
             })
             refreshData();
             setBrand('');
             setSize('');
+            setCategory('');
             setOpen(true);
         } catch (error) {
             console.log(error)
@@ -132,6 +139,64 @@ export default function EditBrands ({brands, colors, sizes}:any){
             </List>
             </Box>
             </Grid>
+
+
+            <Grid item>
+            <Box sx={{ p: 2, border: '1px solid rgba(121, 121, 121, 0.426)', borderRadius:'5px', width: "270px"}}>
+            
+            <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+            <InputLabel htmlFor="add-brand">Add Category</InputLabel>
+            <OutlinedInput
+                id="add-brand"
+                type='text'
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                endAdornment={
+                <InputAdornment position="end">
+                    <IconButton
+                    edge="end"
+                    onClick={() => handleClick('categories')}
+                    >
+                        <AddCircleIcon />
+                    </IconButton>
+                </InputAdornment>
+                }
+                label="Add Brand"
+            />
+            </FormControl>
+
+            <List
+                sx={{
+                    width: '100%',
+                    maxWidth: 220,
+                    bgcolor: 'background.paper',
+                    position: 'relative',
+                    overflow: 'auto',
+                    maxHeight: 300,
+                  }}
+            >
+
+                {!categories.error && categories.map((category:any, i:number) => {
+                return(
+                <ListItem key={i}
+                    secondaryAction={
+                        <div>
+                        <IconButton size='small'>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton size='small'>
+                          <HighlightOffIcon />
+                        </IconButton>
+                        </div>
+                    }
+                >
+                    {category.name} ({category._count.products})
+                </ListItem>
+                )})}
+            </List>
+            </Box>
+            </Grid>
+
 
 
             <Grid item>
@@ -246,6 +311,14 @@ export async function getServerSideProps() {
     })
     const brands = await res.json();
 
+    const resCate = await fetch(`http://localhost:3000/api/categories`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    const categories = await resCate.json();
+
     const colorRes = await fetch(`http://localhost:3000/api/colors`, {
         method: 'GET',
         headers: {
@@ -266,6 +339,7 @@ export async function getServerSideProps() {
     return {
         props: {
             brands,
+            categories,
             colors,
             sizes
         }
