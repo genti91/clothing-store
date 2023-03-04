@@ -6,8 +6,9 @@ import SideBar from "../../components/SideBar";
 import Sorts from "../../components/Sorts";
 
 async function getData () {
-    const res = await fetch('https://ecommerce-jet-psi.vercel.app/api/products', {cache: 'no-store'})
+    const res = await fetch('http://localhost:3000/api/products', {cache: 'no-store'})
     const data = await res.json();
+    console.log('data:',data)
     return data;
 }
 

@@ -43,14 +43,14 @@ export default function Detail(){
                     </div>
                 </div>
             </section>
-            <div className="text-center">
+            {/*<div className="text-center">
                 <h1 className="text-black text-4xl title-font mb-1 font-medium">Related Products</h1>
                 <div className="flex flex-wrap gap-9 py-7 max-w-4xl w-auto place-content-center ml-auto mr-auto">
                     {relatedProducts?.map((item: any, index: number) => {
                         return <Card key={index} item={item}/>
                     })}
                 </div>
-            </div>
+            </div>*/}
         </div>
     );
 }
