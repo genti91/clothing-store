@@ -17,6 +17,7 @@ async function getProduct(req: NextApiRequest, res: NextApiResponse) {
         id: Number(id)
       },
       include: {
+        category: true,
         pictures: true,
         sizes: true,
         brand: true,

@@ -1,10 +1,10 @@
 import Form from "../../components/form";
 
-export default function Edit({brands, colors, sizes, product}:any) {
+export default function Edit({brands, colors, sizes, product, categories}:any) {
     console.log(product)
     return (
       <div>
-        <Form brands={brands} colors={colors} sizes={sizes} edit={product}/>
+        <Form brands={brands} colors={colors} sizes={sizes} edit={product} categories={categories}/>
       </div>
     )
 }
@@ -25,6 +25,13 @@ export async function getServerSideProps(context:any) {
         }
     })
     const brands = await brandRes.json();
+    const categoryRes = await fetch(`http://localhost:3000/api/categories`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    const categories = await categoryRes.json();
     const colorRes = await fetch(`http://localhost:3000/api/colors`, {
         method: 'GET',
         headers: {
@@ -43,6 +50,7 @@ export async function getServerSideProps(context:any) {
         props: {
             product,
             brands,
+            categories,
             colors,
             sizes
         }

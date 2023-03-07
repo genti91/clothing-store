@@ -15,18 +15,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function createProduct(req: NextApiRequest, res: NextApiResponse) {
-  const { name, price, image, description, brand, color, size } = req.body
+  const { name, price, image, description, brand, color, size, category, stock } = req.body
   try{
     const product = await prisma.product.create({
       data: {
         name,
         description,
-        price: price,
+        price,
+        stock,
         pictures: {
           create: image.map((i:any) => ({ url: i.src, position: i.position}))
         },
         brand: {
           connect: { id: brand }
+        },
+        category: {
+          connect: { id: category }
         },
         colors: {
           connect: color.map((c: string) => ({ id: c }))
@@ -47,6 +51,7 @@ async function getProducts(req: NextApiRequest, res: NextApiResponse) {
   try {
     const products = await prisma.product.findMany({
       include: {
+        category: true,
         pictures: true,
         sizes: true,
         brand: true,
@@ -60,7 +65,7 @@ async function getProducts(req: NextApiRequest, res: NextApiResponse) {
 } 
 
 async function updateProduct(req: NextApiRequest, res: NextApiResponse) {
-  const { id, name, price, image, description, brand, color, size } = req.body
+  const { id, name, price, image, description, brand, color, size, stock, category } = req.body
   try {
     const updatedProduct = await prisma.product.update({
       where: { id },
@@ -68,6 +73,7 @@ async function updateProduct(req: NextApiRequest, res: NextApiResponse) {
         name,
         description,
         price,
+        stock,
         pictures: {
           upsert: image.map((i: string) => ({
             where: { url: i },
@@ -81,6 +87,9 @@ async function updateProduct(req: NextApiRequest, res: NextApiResponse) {
         },
         brand: {
           connect: { id: brand }
+        },
+        category: {
+          connect: { id: category }
         },
         colors: {
           set: color.map((c: number) => ({ id: c }))

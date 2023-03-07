@@ -22,9 +22,10 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 interface Product {
   name: string;
   price: number | undefined;
+  stock: number | undefined;
   description: string;
   brand: string | undefined;
-  category: string[];
+  category: string;
   color: string[];
   size: string[];
   image: string[];
@@ -33,6 +34,7 @@ interface Product {
 interface Error {
   name: string;
   price: string;
+  stock: string;
   description: string;
   brand: string;
   category: string;
@@ -42,15 +44,16 @@ interface Error {
   imageOrder: string;
 }
 
-export default function Form({brands, colors, sizes, edit}:any) {
+export default function Form({brands, colors, sizes, edit, categories}:any) {
 
   const clearProduct = () => {
     return {
       name: '',
       price: undefined,
+      stock: undefined,
       description: '',
       brand: '',
-      category: [],
+      category: '',
       color: [],
       size: [],
       image: []
@@ -58,7 +61,7 @@ export default function Form({brands, colors, sizes, edit}:any) {
   }
   const [product, setProduct] = useState<Product>(clearProduct())
   const [error, setError] = useState<Error>({
-    name: '', price: '', description: '', brand: '',
+    name: '', price: '', description: '', brand: '', stock: '',
     category: '', color: '', size: '', image: '', imageOrder:''})
   const [fileInput, setFileInput] = useState('');
   const [selectedFile, setSelectedFile] = useState('');
@@ -83,9 +86,10 @@ export default function Form({brands, colors, sizes, edit}:any) {
     setProduct({
       name: edit.name,
       price: edit.price,
+      stock: edit.stock,
       description: edit.description,
       brand: edit.brandId,
-      category: [],
+      category: edit.categoryId,
       color: edit.colors.map((e:any) => e.name),
       size: edit.sizes.map((e:any) => e.name),
       image: []
@@ -100,11 +104,14 @@ export default function Form({brands, colors, sizes, edit}:any) {
     else error.name = '';
     if (!values.price) required.price = 'Price is required';
     else error.price = '';
+    if (!values.stock) required.stock = 'Stock is required';
+    else error.stock = '';
     if (!values.description) required.description = 'Description is required';
     else error.description = '';
     if (!values.brand) required.brand = 'Brand is required';
     else error.brand = '';
-    // if (!values.category) required.category = 'Required';
+    if (!values.category) required.category = 'Category is required';
+    else error.category = '';
     if (values.color.length === 0) required.color = 'Color is required';
     else error.color = '';
     if (values.size.length === 0) required.size = 'Size is required';
@@ -141,7 +148,7 @@ export default function Form({brands, colors, sizes, edit}:any) {
       let colorsIds:number[] = product.color.map((name:string) => colors.find((color:any) => color.name === name).id)
       let sizesIds:number[] = product.size.map((name:string) => sizes.find((size:any) => size.name === name).id)
       await axios.post('http://localhost:3000/api/product', {...product, image: images, color: colorsIds, size: sizesIds})
-      setProduct({...clearProduct(), brand:undefined, price:0})
+      setProduct({...clearProduct(), brand:undefined, price:0, stock:0})
       setPreviewSource([])
       setCloudinaryData([])
       setLoading(false)
@@ -245,7 +252,8 @@ export default function Form({brands, colors, sizes, edit}:any) {
     if (product.name === edit.name && product.price === edit.price && 
         product.description === edit.description && product.brand === edit.brandId && 
         compareArrays(product.color, edit.colors.map((e:any) => e.name)) && 
-        compareArrays(product.size, edit.sizes.map((e:any) => e.name))) {
+        compareArrays(product.size, edit.sizes.map((e:any) => e.name)) &&
+        product.brand === edit.brandId && product.stock ===  edit.stock) {
         setDisableEdit(true);
     } else {
       setDisableEdit(false);
@@ -303,7 +311,7 @@ export default function Form({brands, colors, sizes, edit}:any) {
                 helperText={error.description}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
             <Autocomplete
               isOptionEqualToValue={(option:any, value) => option.value === value.value}
               disablePortal
@@ -319,6 +327,35 @@ export default function Form({brands, colors, sizes, edit}:any) {
               }}
               defaultValue={edit ? {label: edit.brand.name, value: edit.brand.id}: null}
             />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            <Autocomplete
+              isOptionEqualToValue={(option:any, value) => option.value === value.value}
+              disablePortal
+              id="combo-box-demo"
+              options={!categories.error && categories.map((e:any) => ({label: e.name, value: e.id}))}
+              renderInput={(params) => <TextField {...params} label="Category" error={error.category ? true : false} helperText={error.category}/>}
+              onChange={(_, newValue:any) => {
+                if (newValue === null) {
+                  setProduct({...product, category: ""});
+                } else {
+                  setProduct({...product, category: newValue.value});
+                }
+              }}
+              defaultValue={edit ? {label: edit.category.name, value: edit.category.id}: null}
+            />
+            </Grid>
+            <Grid item xs={12}>
+            <FormControl fullWidth >
+              <InputLabel htmlFor="outlined-adornment-amount">Stock</InputLabel>
+              <OutlinedInput
+                id="outlined-adornment-amount"
+                label="Stock"
+                value={product.stock === 0 ? null : product.stock}
+                onChange={(e) => setProduct({...product, stock: isNaN(e.target.value) ? '' : Number(e.target.value)})}
+                error={error.stock ? true : false}
+              />
+            </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <ColorSelect colors={colors} setProduct={setProduct} product={product} error={error}/>
