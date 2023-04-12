@@ -11,7 +11,7 @@ export default function Create({brands, colors, sizes, categories}:any) {
 }
 
 export async function getServerSideProps() {
-    const res = await fetch(`http://localhost:3000/api/brands`, {
+    const res = await fetch(`http://localhost:3001/api/brands`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -19,7 +19,7 @@ export async function getServerSideProps() {
     })
     const brands = await res.json();
 
-    const categoryRes = await fetch(`http://localhost:3000/api/categories`, {
+    const categoryRes = await fetch(`http://localhost:3001/api/categories`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -27,7 +27,7 @@ export async function getServerSideProps() {
     })
     const categories = await categoryRes.json();
 
-    const colorRes = await fetch(`http://localhost:3000/api/colors`, {
+    const colorRes = await fetch(`http://localhost:3001/api/colors`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -36,7 +36,7 @@ export async function getServerSideProps() {
     const colors = await colorRes.json();
 
 
-    const siezesRes = await fetch(`http://localhost:3000/api/sizes`, {
+    const siezesRes = await fetch(`http://localhost:3001/api/sizes`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

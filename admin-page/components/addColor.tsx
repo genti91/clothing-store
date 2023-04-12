@@ -27,7 +27,7 @@ export default function AlertDialog({refreshData}) {
       console.log("adding color")
       console.log(background)
         try{
-            let newColor = await fetch('http://localhost:3000/api/colors', {
+            let newColor = await fetch('http://localhost:3001/api/colors', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
