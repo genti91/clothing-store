@@ -16,8 +16,6 @@ import SizeSelect from './sizeSelect';
 import axios from 'axios';
 import FormHelperText from '@mui/material/FormHelperText';
 import ImageGrid from './imageGrid.jsx';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 
 interface Product {
   name: string;
