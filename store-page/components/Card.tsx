@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Card({item}: any) {
+    console.log(item)
     const { pictures, name, price } = item
     return (
         <Link href='/detail'>

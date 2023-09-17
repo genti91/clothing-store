@@ -11,35 +11,35 @@ export default function Edit({brands, colors, sizes, product, categories}:any) {
 
 export async function getServerSideProps(context:any) {
   const { id } = context.query
-    const productRes = await fetch(`http://localhost:3001/api/product/${id}`, {
+    const productRes = await fetch(`http://localhost:3000/api/product/${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         }
     })
     const product = await productRes.json();
-    const brandRes = await fetch(`http://localhost:3001/api/brands`, {
+    const brandRes = await fetch(`http://localhost:3000/api/brands`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         }
     })
     const brands = await brandRes.json();
-    const categoryRes = await fetch(`http://localhost:3001/api/categories`, {
+    const categoryRes = await fetch(`http://localhost:3000/api/categories`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         }
     })
     const categories = await categoryRes.json();
-    const colorRes = await fetch(`http://localhost:3001/api/colors`, {
+    const colorRes = await fetch(`http://localhost:3000/api/colors`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         }
     })
     const colors = await colorRes.json();
-    const siezesRes = await fetch(`http://localhost:3001/api/sizes`, {
+    const siezesRes = await fetch(`http://localhost:3000/api/sizes`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

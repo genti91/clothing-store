@@ -147,7 +147,7 @@ export default function Form({brands, colors, sizes, edit, categories}:any) {
       let images = await uploadToCloudinary();
       let colorsIds:number[] = product.color.map((name:string) => colors.find((color:any) => color.name === name).id)
       let sizesIds:number[] = product.size.map((name:string) => sizes.find((size:any) => size.name === name).id)
-      await axios.post('http://localhost:3001/api/product', {...product, image: images, color: colorsIds, size: sizesIds})
+      await axios.post('http://localhost:3000/api/product', {...product, image: images, color: colorsIds, size: sizesIds})
       setProduct({...clearProduct(), brand:undefined, price:0, stock:0})
       setPreviewSource([])
       setCloudinaryData([])
